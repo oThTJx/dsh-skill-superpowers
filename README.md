@@ -4,7 +4,7 @@ English | [中文](README.zh.md)
 
 Installable DeepSeek Harness plugin bundle that brings [obra/superpowers](https://github.com/obra/superpowers) into product sessions: the full skill library, adapted to dsh tooling, plus a SessionStart-equivalent bootstrap.
 
-Publish name: `@firefly0621/dsh-skill-superpowers` (version tracks the harness family, currently `0.1.0-rc.6`). Source of record for this fork package: [github.com/oThTJx/dsh-skill-superpowers](https://github.com/oThTJx/dsh-skill-superpowers). This package is opt-in and is not part of the official main `dsh-base` composition.
+Publish name: `@firefly0621/dsh-skill-superpowers` (version tracks the harness family, currently `0.1.0-rc.8`). Source of record for this fork package: [github.com/oThTJx/dsh-skill-superpowers](https://github.com/oThTJx/dsh-skill-superpowers). This package is opt-in and is not part of the official main `dsh-base` composition.
 
 ## What it restores
 
@@ -12,7 +12,7 @@ Publish name: `@firefly0621/dsh-skill-superpowers` (version tracks the harness f
 |---|---|
 | Skills library under `skills/*/SKILL.md` | `ctx.skills` provider `superpowers` (packaged `skills/` directory, dsh-adapted) |
 | SessionStart hook injecting `using-superpowers` | `agent/session-start` → `agent.inject()` with the same `<EXTREMELY_IMPORTANT>` framing |
-| Platform `references/*-tools.md` | bundled `assets/dsh-tools.md` appended in that bootstrap |
+| Platform `references/*-tools.md` | bundled `skills/using-superpowers/references/dsh-tools.md` appended in that bootstrap |
 | Subagent skip (`SUBAGENT-STOP`) | no bootstrap when `session.header.origin === 'subagent'` |
 | Model loads other skills on demand | existing `dsh-tool-skill` catalog + `skill` tool |
 
@@ -76,7 +76,7 @@ There is no vendored submodule. To re-port a newer upstream release, diff the up
 
 #### What the model sees
 
-On `startup` for non-subagent sessions, one durable user-role plugin message whose text is `buildBootstrapPreamble(...)`: Superpowers' `<EXTREMELY_IMPORTANT>` wrapper, the full `using-superpowers` SKILL.md, then the dsh platform adaptation from `assets/dsh-tools.md`. On `resume`, the same preamble is injected only when the restored log does not already contain a Superpowers bootstrap message (sessions created before this overlay was enabled).
+On `startup` for non-subagent sessions, one durable user-role plugin message whose text is `buildBootstrapPreamble(...)`: Superpowers' `<EXTREMELY_IMPORTANT>` wrapper, the full `using-superpowers` SKILL.md, then the dsh platform adaptation from `skills/using-superpowers/references/dsh-tools.md`. On `resume`, the same preamble is injected only when the restored log does not already contain a Superpowers bootstrap message (sessions created before this overlay was enabled).
 
 #### Token effect
 
