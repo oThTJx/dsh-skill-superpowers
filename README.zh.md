@@ -4,7 +4,7 @@
 
 可安装的 DeepSeek Harness 插件组合包：把 [obra/superpowers](https://github.com/obra/superpowers) 接入产品会话——完整 skill 库（已适配 dsh 工具）+ 等价于 SessionStart 的引导注入。
 
-发布名：`@firefly0621/dsh-skill-superpowers`（版本跟随 harness 家族，当前为 `0.1.0-rc.8`）。本 fork 包的源码真源：[github.com/oThTJx/dsh-skill-superpowers](https://github.com/oThTJx/dsh-skill-superpowers)。本包为显式 opt-in，不属于官方 main 的 `dsh-base` 组合。
+发布名：`@firefly0621/dsh-skill-superpowers`（版本跟随 harness 家族，当前为 `0.1.0-rc.9`）。本 fork 包的源码真源：[github.com/oThTJx/dsh-skill-superpowers](https://github.com/oThTJx/dsh-skill-superpowers)。本包为显式 opt-in，不属于官方 main 的 `dsh-base` 组合。
 
 ## 还原的能力
 

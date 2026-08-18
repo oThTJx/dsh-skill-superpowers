@@ -4,7 +4,7 @@ English | [中文](README.zh.md)
 
 Installable DeepSeek Harness plugin bundle that brings [obra/superpowers](https://github.com/obra/superpowers) into product sessions: the full skill library, adapted to dsh tooling, plus a SessionStart-equivalent bootstrap.
 
-Publish name: `@firefly0621/dsh-skill-superpowers` (version tracks the harness family, currently `0.1.0-rc.8`). Source of record for this fork package: [github.com/oThTJx/dsh-skill-superpowers](https://github.com/oThTJx/dsh-skill-superpowers). This package is opt-in and is not part of the official main `dsh-base` composition.
+Publish name: `@firefly0621/dsh-skill-superpowers` (version tracks the harness family, currently `0.1.0-rc.9`). Source of record for this fork package: [github.com/oThTJx/dsh-skill-superpowers](https://github.com/oThTJx/dsh-skill-superpowers). This package is opt-in and is not part of the official main `dsh-base` composition.
 
 ## What it restores
 
