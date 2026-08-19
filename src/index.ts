@@ -182,6 +182,26 @@ export function sessionHasSuperpowersBootstrap(agent: Agent): boolean {
 }
 
 /**
+ * Whether a Superpowers bootstrap instructions message is on the model-visible
+ * surface (not merely in the durable log). Compaction shadows the message by
+ * replacing its surface node; the pre-step refresh re-injects when this is
+ * false so the guidance cannot stay lost mid-session.
+ * @param agent - live agent whose durable events and surface are scanned.
+ * @returns true when a readable bootstrap message is currently visible.
+ */
+export function sessionHasSuperpowersBootstrapVisible(agent: Agent): boolean {
+  const visible = new Set(agent.session.surface.nodes)
+  for (const event of agent.session.events) {
+    if (event.type !== 'user/message') continue
+    const source = event.data.source
+    if (source.kind === 'plugin' && source.plugin === PLUGIN_SOURCE && source.form === 'instructions') {
+      if (visible.has(event.seq)) return true
+    }
+  }
+  return false
+}
+
+/**
  * Register the Superpowers skill provider and optional session-start bootstrap.
  * @param ctx - Cordis context with `skills` and `agents`.
  * @param config - optional skills root and bootstrap toggle.
@@ -222,6 +242,26 @@ export function apply(ctx: Context, config: Config = {}): void {
       injectBootstrap(agent, preamble)
     }
   })
+
+  // The session-start inject fires once per session, and compaction can shadow
+  // the durable copy. Refresh from the pre-step: skip while a copy is in the
+  // claimed batch (the session-start inject lands there before the first step
+  // persists it) or remains on the visible surface, re-inject the same preamble
+  // otherwise (the loop appends the returned message with surfaceOp 'append',
+  // so the refreshed copy lands in this step's request).
+  ctx.on('agent/pre-step', async ({ agent, messages }, next) => {
+    const decision = await next()
+    if (decision.kind === 'reject') return decision
+    if (agent.session.header.origin === 'subagent') return decision
+    if (messages.some(message =>
+      message.source.kind === 'plugin'
+      && message.source.plugin === PLUGIN_SOURCE
+      && message.source.form === 'instructions')) {
+      return decision
+    }
+    if (sessionHasSuperpowersBootstrapVisible(agent)) return decision
+    return { kind: 'enter', messages: [buildBootstrapMessage(preamble), ...decision.messages] }
+  })
 }
 
 /**
@@ -235,15 +275,19 @@ export function loadBootstrapPreamble(skillsRoot: string): string {
   return buildBootstrapPreamble(usingRaw, dshTools)
 }
 
-function injectBootstrap(agent: Agent, preamble: string): void {
-  agent.inject(createUserMessage({
+function buildBootstrapMessage(preamble: string) {
+  return createUserMessage({
     content: [{ type: 'text', text: preamble }],
     source: {
       kind: 'plugin',
       plugin: PLUGIN_SOURCE,
       form: 'instructions',
     },
-  }))
+  })
+}
+
+function injectBootstrap(agent: Agent, preamble: string): void {
+  agent.inject(buildBootstrapMessage(preamble))
 }
 
 async function readSkillBundle(skillPath: string, dir: string): Promise<ParsedSkillFile | undefined> {

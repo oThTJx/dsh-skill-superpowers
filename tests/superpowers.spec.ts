@@ -22,6 +22,7 @@ import {
   loadSuperpowersSkill,
   resolveSkillsRoot,
   sessionHasSuperpowersBootstrap,
+  sessionHasSuperpowersBootstrapVisible,
 } from '@firefly0621/dsh-skill-superpowers'
 import { MockAdapter, textResponse } from '../../../core/agent-loop/tests/mock-adapter.ts'
 
@@ -55,7 +56,7 @@ function pluginMessages(agent: Agent): string[] {
 describe('resolveSkillsRoot / assertSkillsRoot', () => {
   it('defaults to the packaged skills directory', () => {
     expect(resolveSkillsRoot()).toMatch(/skills[/\\]?$/)
-    expect(() => assertSkillsRoot(resolveSkillsRoot())).not.toThrow()
+    expect(() => { assertSkillsRoot(resolveSkillsRoot()) }).not.toThrow()
   })
 
   it('honors an explicit skillsRoot', () => {
@@ -63,7 +64,7 @@ describe('resolveSkillsRoot / assertSkillsRoot', () => {
   })
 
   it('fails loud when the skills root is missing', () => {
-    expect(() => assertSkillsRoot(join(tmpdir(), 'dsh-skill-superpowers-missing-root')))
+    expect(() => { assertSkillsRoot(join(tmpdir(), 'dsh-skill-superpowers-missing-root')) })
       .toThrow(/skills root missing/)
   })
 })
@@ -212,7 +213,7 @@ describe('package composition contracts', () => {
       repository: { url: string }
       dsh: { bundle: { patch: string } }
     }
-    expect(pkg.version).toBe('0.1.0-rc.7')
+    expect(pkg.version).toBe('0.1.0-rc.10')
     expect(pkg.dsh.bundle.patch).toBe('./cordis.patch.yml')
     expect(pkg.files).toEqual([
       'lib/index.js',
@@ -370,5 +371,65 @@ describe('dsh-skill-superpowers plugin', () => {
     await waitForIdle(ctx2, a2)
     expect(pluginMessages(a2)).toHaveLength(1)
     await ctx2.fiber.dispose()
+  })
+
+  it('does not duplicate the bootstrap while it stays visible', async () => {
+    const ctx = new Context()
+    await mountAgentLoopTestDependencies(ctx)
+    await ctx.plugin(AgentLoop, { agents: [] })
+    await ctx.plugin(SkillRegistry)
+    await ctx.plugin(Superpowers)
+    const adapter = new MockAdapter([textResponse('one'), textResponse('two')])
+    ctx.llm.registerAdapter(['mock'], adapter)
+
+    const agent = ctx.agentLoop.create(SessionId('sp-once'), { provider: 'mock', model: 'mock' })
+    agent.followup(createUserMessage({ content: [{ type: 'text', text: 'first' }], source: { kind: 'user' } }))
+    await waitForIdle(ctx, agent)
+    expect(pluginMessages(agent)).toHaveLength(1)
+    expect(sessionHasSuperpowersBootstrapVisible(agent)).toBe(true)
+
+    agent.followup(createUserMessage({ content: [{ type: 'text', text: 'second' }], source: { kind: 'user' } }))
+    await waitForIdle(ctx, agent)
+    expect(pluginMessages(agent)).toHaveLength(1)
+    expect(sessionHasSuperpowersBootstrapVisible(agent)).toBe(true)
+    expect(JSON.stringify(adapter.requests[1]!.messages)).toContain('You have superpowers.')
+  })
+
+  it('re-injects the bootstrap after it leaves the model-visible surface', async () => {
+    const ctx = new Context()
+    await mountAgentLoopTestDependencies(ctx)
+    await ctx.plugin(AgentLoop, { agents: [] })
+    await ctx.plugin(SkillRegistry)
+    await ctx.plugin(Superpowers)
+    const adapter = new MockAdapter([textResponse('one'), textResponse('two')])
+    ctx.llm.registerAdapter(['mock'], adapter)
+
+    const agent = ctx.agentLoop.create(SessionId('sp-reinject'), { provider: 'mock', model: 'mock' })
+    agent.followup(createUserMessage({ content: [{ type: 'text', text: 'first' }], source: { kind: 'user' } }))
+    await waitForIdle(ctx, agent)
+    expect(pluginMessages(agent)).toHaveLength(1)
+    expect(sessionHasSuperpowersBootstrapVisible(agent)).toBe(true)
+
+    // Compaction-style replacement shadows the bootstrap node.
+    const bootSeq = [...agent.session.events].find(
+      (e): e is SessionEvent<'user/message'> =>
+        e.type === 'user/message' && e.data.source.kind === 'plugin' && e.data.source.plugin === 'superpowers',
+    )?.seq
+    expect(bootSeq).toEqual(expect.any(Number))
+    agent.session.append('user/message', createUserMessage({
+      content: [{ type: 'text', text: '[compacted prior bootstrap]' }],
+      source: { kind: 'plugin', plugin: 'test-compact' },
+    }), {
+      surfaceOp: { op: 'replace', start: bootSeq!, end: bootSeq! },
+      sourceEventSeqs: [bootSeq!],
+    })
+    expect(sessionHasSuperpowersBootstrap(agent)).toBe(true)
+    expect(sessionHasSuperpowersBootstrapVisible(agent)).toBe(false)
+
+    agent.followup(createUserMessage({ content: [{ type: 'text', text: 'second' }], source: { kind: 'user' } }))
+    await waitForIdle(ctx, agent)
+    expect(pluginMessages(agent)).toHaveLength(2)
+    expect(sessionHasSuperpowersBootstrapVisible(agent)).toBe(true)
+    expect(JSON.stringify(adapter.requests[1]!.messages)).toContain('You have superpowers.')
   })
 })

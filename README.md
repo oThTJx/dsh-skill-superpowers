@@ -76,7 +76,7 @@ There is no vendored submodule. To re-port a newer upstream release, diff the up
 
 #### What the model sees
 
-On `startup` for non-subagent sessions, one durable user-role plugin message whose text is `buildBootstrapPreamble(...)`: Superpowers' `<EXTREMELY_IMPORTANT>` wrapper, the full `using-superpowers` SKILL.md, then the dsh platform adaptation from `skills/using-superpowers/references/dsh-tools.md`. On `resume`, the same preamble is injected only when the restored log does not already contain a Superpowers bootstrap message (sessions created before this overlay was enabled).
+On `startup` for non-subagent sessions, one durable user-role plugin message whose text is `buildBootstrapPreamble(...)`: Superpowers' `<EXTREMELY_IMPORTANT>` wrapper, the full `using-superpowers` SKILL.md, then the dsh platform adaptation from `skills/using-superpowers/references/dsh-tools.md`. On `resume`, the same preamble is injected only when the restored log does not already contain a Superpowers bootstrap message (sessions created before this overlay was enabled). If compaction shadows the durable copy, the next pre-step re-injects it, so the guidance cannot stay lost mid-session.
 
 #### Token effect
 
@@ -84,7 +84,7 @@ One large retained preamble per session that needs it; skill catalog entries add
 
 #### KV Cache effect
 
-Append-only after existing reusable prefixes for that session. Resume of a session that already carries the bootstrap does not append another copy.
+Append-only after existing reusable prefixes for that session. Resume of a session that already carries the bootstrap does not append another copy; a compaction-shadowed re-inject appends one fresh copy.
 
 ### Skill catalog and `skill` tool
 

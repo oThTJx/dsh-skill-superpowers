@@ -76,7 +76,7 @@ dsh web --patch packages/skill/skill-superpowers/cordis.patch.yml
 
 #### What the model sees
 
-非 subagent 会话在 `startup` 时注入一条 durable 的 plugin 用户消息：Superpowers 的 `<EXTREMELY_IMPORTANT>` 包装、完整 `using-superpowers` SKILL.md，以及 `skills/using-superpowers/references/dsh-tools.md` 适配说明。`resume` 仅在恢复日志中尚无 Superpowers 引导时补注（例如启用 overlay 之前创建的会话）。
+非 subagent 会话在 `startup` 时注入一条 durable 的 plugin 用户消息：Superpowers 的 `<EXTREMELY_IMPORTANT>` 包装、完整 `using-superpowers` SKILL.md，以及 `skills/using-superpowers/references/dsh-tools.md` 适配说明。`resume` 仅在恢复日志中尚无 Superpowers 引导时补注（例如启用 overlay 之前创建的会话）。若 compaction 遮蔽了 durable 副本，下一次 pre-step 会补注，引导不会在会话中途丢失。
 
 #### Token effect
 
@@ -84,7 +84,7 @@ dsh web --patch packages/skill/skill-superpowers/cordis.patch.yml
 
 #### KV Cache effect
 
-在该会话已有可复用前缀之后追加；已含引导的 resume 不再追加第二份。
+在该会话已有可复用前缀之后追加；已含引导的 resume 不再追加第二份；被 compaction 遮蔽后的补注追加一份新副本。
 
 ### Skill catalog and `skill` tool
 
