@@ -203,3 +203,7 @@ You understand 1,2,3,6. Unclear on 4,5.
 ## GitHub Thread Replies
 
 When replying to inline review comments on GitHub, reply in the comment thread (`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`), not as a top-level PR comment.
+
+## Integration
+
+When teach-back would add learning or review value (for example the user asks why you chose an approach), you **may recommend** loading `explaining-changes` — a single decision point, not after every review item.

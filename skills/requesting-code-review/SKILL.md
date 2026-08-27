@@ -1,6 +1,6 @@
 ---
 name: requesting-code-review
-description: Use when completing tasks, implementing major features, or before merging to verify work meets requirements
+description: Use when completing tasks, implementing major features, or before merging to verify work meets requirements. Do not use as a substitute for verifying your own changes before review.
 ---
 
 # Requesting Code Review
@@ -8,6 +8,23 @@ description: Use when completing tasks, implementing major features, or before m
 Dispatch a code reviewer subagent to catch issues before they cascade. The reviewer gets precisely crafted context for evaluation — never your session's history.
 
 **Core principle:** Review early, review often.
+
+## Two axes: Standards ∥ Spec
+
+Review the diff between `HEAD` and a fixed point along **two separate axes** (do not merge findings across axes):
+
+- **Standards:** does the code conform to this repo's documented coding standards?
+- **Spec:** does the code faithfully implement the originating issue / design / plan?
+
+When useful, run both as **parallel** `subagent` / `subagent_fork` reviewers so they don't pollute each other's context, then aggregate under `## Standards` and `## Spec`.
+
+**Pin the fixed point first:** commit SHA, branch, tag, or merge-base. Confirm `git rev-parse` and a non-empty `git diff <fixed-point>...HEAD` (three-dot) before spawning reviewers.
+
+**Spec source:** issue refs in commits, a path the user passed, or a design/plan under `docs/` / `docs/superpowers/`. If none exists, skip the Spec axis and note "no spec available" — do **not** require a Matt issue-tracker setup doc.
+
+**Standards sources:** repo docs such as `AGENTS.md`, `CODING_STANDARDS.md`, `CONTRIBUTING.md`. On top of those, carry a **Fowler smell baseline** (Refactoring ch.3) as judgment heuristics only: Mysterious Name, Duplicated Code, Feature Envy, Data Clumps, Primitive Obsession, Repeated Switches, Shotgun Surgery, Divergent Change, Speculative Generality, Message Chains, Middle Man, Refused Bequest. Rules: **the repo overrides** the baseline; baseline smells are always judgment calls, never hard violations; skip anything tooling already enforces.
+
+**Behavior proof** (does it actually work end-to-end?) stays in `verification-before-completion` — not a third review axis here.
 
 ## When to Request Review
 

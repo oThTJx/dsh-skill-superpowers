@@ -1,22 +1,23 @@
 /**
- * Package-owned invariant companion for `@firefly0621/dsh-skill-superpowers`.
- * @module @firefly0621/dsh-skill-superpowers/invariant
+ * Package-owned invariant companion for `@firefly0621/dsh-superpowers`.
+ * @module @firefly0621/dsh-superpowers/invariant
  */
 
 /* jscpd:ignore-start */
 import type { Context } from '@deepseek-ai/cordis'
 import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 
-const PACKAGE_NAME = '@firefly0621/dsh-skill-superpowers'
+const PACKAGE_NAME = '@firefly0621/dsh-superpowers'
 
 /** Cordis companion plugin name. */
-export const name = 'skill-superpowers-invariant'
+export const name = 'superpowers-invariant'
 /** Service required before the companion can reserve package ownership. */
 export const inject = ['invariants']
 
 /**
  * No runtime invariant: skills are immutable packaged files and bootstrap is a
- * one-shot inject with no package-owned event stream for an independent companion.
+ * `system-prompt/assemble` listener; this package owns no durable event stream
+ * for an independent companion.
  */
 const install: InvariantInstaller = () => {}
 

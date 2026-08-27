@@ -2,7 +2,7 @@
  * Fail pack/publish when required payload is missing or `lib/` is older than `src/`.
  * Pack from a built workspace:
  *   pnpm run build:lib:host
- *   pnpm --filter @firefly0621/dsh-skill-superpowers pack
+ *   pnpm --filter @firefly0621/dsh-superpowers pack
  */
 import { existsSync, statSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -21,10 +21,10 @@ const required = [
 const missing = required.filter((rel) => !existsSync(join(root, rel)))
 if (missing.length > 0) {
   console.error(
-    '@firefly0621/dsh-skill-superpowers prepack: missing required files:\n'
+    '@firefly0621/dsh-superpowers prepack: missing required files:\n'
       + missing.map((rel) => `  - ${rel}`).join('\n')
       + '\nRun: pnpm run build:lib:host'
-      + '\nThen: pnpm --filter @firefly0621/dsh-skill-superpowers pack',
+      + '\nThen: pnpm --filter @firefly0621/dsh-superpowers pack',
   )
   process.exit(1)
 }
@@ -35,7 +35,7 @@ const libMtime = statSync(libIndex).mtimeMs
 const srcMtime = statSync(srcIndex).mtimeMs
 if (srcMtime > libMtime) {
   console.error(
-    '@firefly0621/dsh-skill-superpowers prepack: src/index.ts is newer than lib/index.js.\n'
+    '@firefly0621/dsh-superpowers prepack: src/index.ts is newer than lib/index.js.\n'
       + 'Run `pnpm run build:lib:host` before pack/publish so the tarball is not stale.',
   )
   process.exit(1)

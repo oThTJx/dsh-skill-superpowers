@@ -118,3 +118,7 @@ Skip any step = lying, not verifying
 - Paraphrases and synonyms
 - Implications of success
 - ANY communication suggesting completion/correctness
+
+## Integration
+
+When the repository-specific harness gate is relevant, verification-before-completion **may recommend** `dsh-harness-contributor`. **The current skill remains responsible for its own verification gate.**

@@ -15,6 +15,8 @@ description: Use when implementation is complete, all tests pass, and you need t
 
 Run the project's full test suite (`npm test` / `cargo test` / `pytest` / `go test ./...`).
 
+For **deepseek-harness** repository work, read `dsh-tools.md` §Harness verification matrix before claiming push, PR, or merge readiness — the project's suite is necessary but not always sufficient for harness change surfaces.
+
 **If tests fail**, report the failures and stop — the menu comes after a green suite:
 
 ```

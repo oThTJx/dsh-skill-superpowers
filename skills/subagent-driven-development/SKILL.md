@@ -232,16 +232,14 @@ Everything you paste into a dispatch prompt — and everything a subagent
 prints back — stays resident in your context for the rest of the session
 and is re-read on every later turn. Hand artifacts over as files.
 
-**Waiting on dispatched subagents:** never poll a wait interface with
-short timeouts, and never sit in one silent, open-ended wait either.
-While you have local work — ledger updates, packaging the next review,
-reading reports — keep working; child results arrive on their own.
-When you are genuinely idle, wait in bounded stretches (five to ten
-minutes, where your platform allows), and between stretches post one
-line of status and reconcile your live children: list them, and chase
-any that finished without reporting. A bounded stretch keeps nearly
-all of a long wait's efficiency while guaranteeing a stuck or lost
-child is noticed within minutes, not at the end of the session.
+**Waiting on dispatched subagents:** on dsh, child completion arrives as a
+**settlement notice** (see `using-superpowers` → `references/dsh-tools.md`).
+After background dispatch, finish any local work that does not need the
+child's result, then **end this turn**. Do **not** call `list_agents` to
+wait, do not `send_message` status pings, and do not `interrupt_agent`
+out of impatience. The next turn consumes the settlement notice and
+report, then continues the loop. Use `list_agents` only to reconcile a
+missing or stuck report after a notice should already have arrived.
 
 ### 1. Dispatch the implementer
 

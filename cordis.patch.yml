@@ -1,7 +1,7 @@
-# Installable overlay / custom-base patch for `@firefly0621/dsh-skill-superpowers`.
+# Installable overlay / custom-base patch for `@firefly0621/dsh-superpowers`.
 # Fork `dsh-base` already mounts this package. Prefer:
-#   dsh plugin --profile web add @firefly0621/dsh-skill-superpowers
-# Do not add that profile install on top of a base that already mounts `id: skill-superpowers`.
+#   dsh plugin --profile web add @firefly0621/dsh-superpowers
+# Do not add that profile install on top of a base that already mounts `id: superpowers`.
 - insert:
-    - id: skill-superpowers
-      name: '@firefly0621/dsh-skill-superpowers'
+    - id: superpowers
+      name: '@firefly0621/dsh-superpowers'

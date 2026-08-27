@@ -1,6 +1,6 @@
 ---
 name: test-driven-development
-description: Use when implementing any feature or bugfix, before writing implementation code
+description: Use when implementing any feature or bugfix, before writing implementation code. Do not use for throwaway prototypes or configuration-only edits.
 ---
 
 # Test-Driven Development (TDD)
@@ -44,8 +44,23 @@ Write code before the test? Delete it. Start over.
 
 Implement fresh from tests. Period.
 
+## Seams (agree before testing)
+
+A **seam** is the public boundary you test at: the interface where you observe behavior without reaching inside. Tests live at seams, never against internals.
+
+**Before writing any test**, write down the seams under test and confirm them with the user. No test at an unconfirmed seam. Ask: "What's the public interface, and which seams should we test?"
+
+When the shape of that interface is itself in question (depth, where the seam belongs, what to expose), load `codebase-design` for the shared vocabulary (module, interface, depth, seam, adapter). It is a reference to consult, not a session to run.
+
+## Anti-patterns
+
+- **Implementation-coupled:** mocks internal collaborators, tests private methods, or verifies through a side channel. Tell: the test breaks on refactor while behavior is unchanged.
+- **Tautological:** the assertion recomputes the expected value the way the code does, so it passes by construction. Expected values must come from an independent source of truth (literal, worked example, spec).
+- **Horizontal slicing:** writing all tests first, then all implementation. Work in **vertical slices** instead: one test → one implementation → repeat.
+
 ## Red-Green-Refactor
 
+**Authoritative cycle:** red → green → **refactor** (stay green). Refactor is part of this loop. Do not defer cleanup to a later review stage.
 ```dot
 digraph tdd_cycle {
     rankdir=LR;

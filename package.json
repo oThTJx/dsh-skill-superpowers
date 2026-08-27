@@ -1,13 +1,13 @@
 {
-  "name": "@firefly0621/dsh-skill-superpowers",
-  "description": "obra/superpowers skills provider plus session-start bootstrap for DeepSeek Harness",
-  "version": "0.1.0-rc.10",
+  "name": "@firefly0621/dsh-superpowers",
+  "description": "obra/superpowers skills provider plus system-prompt bootstrap for DeepSeek Harness",
+  "version": "0.1.0-rc.21",
   "publishConfig": {
     "access": "public"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/oThTJx/dsh-skill-superpowers.git"
+    "url": "git+https://github.com/oThTJx/dsh-superpowers.git"
   },
   "type": "module",
   "main": "lib/index.js",
@@ -51,6 +51,7 @@
     "@deepseek-ai/dsh-invariants": "workspace:^",
     "@deepseek-ai/dsh-llm": "workspace:^",
     "@deepseek-ai/dsh-skill": "workspace:^",
+    "@deepseek-ai/dsh-system-prompt": "workspace:^",
     "@deepseek-ai/cordis": "workspace:^"
   },
   "devDependencies": {
@@ -61,8 +62,8 @@
     "@deepseek-ai/dsh-invariants": "workspace:^",
     "@deepseek-ai/dsh-llm": "workspace:^",
     "@deepseek-ai/dsh-session": "workspace:^",
-    "@deepseek-ai/dsh-session-persistence-jsonl": "workspace:^",
     "@deepseek-ai/dsh-skill": "workspace:^",
+    "@deepseek-ai/dsh-system-prompt": "workspace:^",
     "@deepseek-ai/dsh-tool-skill": "workspace:^",
     "@deepseek-ai/cordis": "workspace:^"
   }

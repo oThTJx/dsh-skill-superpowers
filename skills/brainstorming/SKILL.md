@@ -17,6 +17,12 @@ project, or take any implementation action until you have told your
 human partner what you intend and they have approved it. This applies
 to EVERY task on EVERY path below — the ceremony scales with the task;
 the approval gate never does.
+
+CRITICAL: "User said to start" ≠ "Skip all steps." User approval is
+for the DESIGN you presented, not for skipping the process. If you
+haven't completed all steps for your path, you have NOT received
+approval to proceed. The user saying "OK, start" means "proceed with
+the next step," not "jump to coding."
 </HARD-GATE>
 
 ## Three Paths
@@ -60,6 +66,23 @@ it and get approval. "Simple" tasks are where unexamined assumptions
 cause the most wasted work. What scales with simplicity is the
 artifact, never the approval.
 
+## Rationalizations for Skipping Steps
+
+These are **rationalizations** — reasons to skip brainstorming steps. If you catch yourself thinking these, STOP and follow the skill exactly:
+
+| Rationalization | Why It's Wrong |
+|-----------------|----------------|
+| "The user said 'start implementing'" | "Start implementing" means "proceed after approval," not "skip to coding." Each step has its own gate. |
+| "Let me be practical" | Practical means following the skill, not improvising. Skills exist because improvisation fails. |
+| "The user wants speed" | Skills ARE the speed — skipping them causes rework. The fastest path is the disciplined one. |
+| "I'll ask questions while I build" | Skills separate discovery from execution for a reason. Concurrent discovery causes thrashing. |
+| "The user approved my approach" | Approving an approach ≠ approving to skip steps. Each step has its own gate. |
+| "I already know what to build" | Knowing ≠ validating. Skills force you to validate assumptions before they become bugs. |
+| "The user said 'just do it'" | "Just do it" means "don't overthink," not "skip the process." The skill already handles this. |
+| "This is a simple task" | Simple tasks need short plans, not no plans. Scale the ceremony, not skip it. |
+| "The user is waiting, I should start coding" | The user is waiting for a correct solution, not a fast wrong one. Skills prevent rework. |
+| "I'll do the design steps later" | Later means never. Skills are ordered for a reason — each step depends on the previous. |
+
 ## Red Flags
 
 | Thought | Reality |
@@ -76,6 +99,15 @@ artifact, never the approval.
 
 Classify first, announce the path, then create a task for each item on
 your path and complete them in order.
+
+**Step Verification:** Before proceeding to the next step, explicitly
+state which step you just completed and which step you're moving to.
+Example: "Step 3 complete (clarifying questions asked). Moving to Step
+4 (propose approaches)." This prevents skipping steps accidentally.
+
+**Hard Stop:** If you catch yourself thinking "let me just skip this
+step" or "the user wants me to go faster," STOP. You are rationalizing.
+Return to the checklist and complete the current step properly.
 
 **Spike:**
 1. **Explore project context** — enough to frame the probe
@@ -94,13 +126,29 @@ your path and complete them in order.
 **Architectural:**
 1. **Explore project context** — check files, docs, recent commits
 2. **Offer the visual companion just-in-time** — NOT upfront. The first time a question would genuinely be clearer shown than described, offer it then (its own message); on approval its browser tab opens for you. If no visual question ever arises, never offer it. See the Visual Companion section below.
-3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
+3. **Grill clarifying decisions (frontier rounds)** — work a design tree: each round ask every frontier question whose prerequisites are settled. For each question use the decision-support format below (Options / Trade-offs / Recommendation / Reason / What would change this recommendation). Do **not** load, invoke, or delegate to the `grilling` skill for this path — the methodology is inline here. Wait for answers before the next round. User acceptance of a recommendation is provisional until trade-offs are engaged or the user explicitly accepts.
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
 6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
 7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
 8. **User reviews written spec** — ask user to review the spec file before proceeding
 9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+
+### Architectural clarifying format (Step 3)
+
+Each frontier question in a round:
+
+```markdown
+❓ **Q<n>** - **<title>**: <body>
+
+**Options:** …
+**Trade-offs:** …
+**Recommendation:** …
+**Reason:** …
+**What would change this recommendation:** …
+```
+
+No bare “Recommended: A” without trade-offs, reason, and change conditions. Finding facts is your job (look them up or use a `subagent` / `subagent_fork` when needed); decisions stay with the user. The frontier is empty when every branch of the design tree is visited and nothing is silently assumed.
 
 ## Process Flow
 
@@ -114,7 +162,7 @@ digraph brainstorming {
     "Investigate; report recommendation" [shape=doublecircle];
     "Implement via normal workflow (no plan doc)" [shape=doublecircle];
     "Explore project context" [shape=box];
-    "Ask clarifying questions" [shape=box];
+    "Grill clarifying decisions\n(frontier rounds)" [shape=box];
     "Propose 2-3 approaches" [shape=box];
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
@@ -133,8 +181,8 @@ digraph brainstorming {
     "Human approves?" -> "Investigate; report recommendation" [label="spike: yes"];
     "Human approves?" -> "Implement via normal workflow (no plan doc)" [label="bounded: yes"];
     "Hidden complexity? Upgrade path" -> "Classify: spike / bounded / architectural";
-    "Explore project context" -> "Ask clarifying questions";
-    "Ask clarifying questions" -> "Propose 2-3 approaches";
+    "Explore project context" -> "Grill clarifying decisions\n(frontier rounds)";
+    "Grill clarifying decisions\n(frontier rounds)" -> "Propose 2-3 approaches";
     "Propose 2-3 approaches" -> "Present design sections";
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
@@ -147,8 +195,8 @@ digraph brainstorming {
 ```
 
 **Terminal states are path-bound.** Architectural: the ONLY skill you
-invoke after brainstorming is writing-plans — never frontend-design,
-mcp-builder, or any other implementation skill. Bounded: after
+invoke after brainstorming is writing-plans — never an implementation
+skill. Bounded: after
 approval, implementation proceeds directly through the normal
 development workflow; no plan document. Spike: the terminal state is a
 reported recommendation.
@@ -166,9 +214,8 @@ is the whole process.
 - Check out the current project state first (files, docs, recent commits)
 - Before asking detailed questions, assess scope: if the request describes multiple independent subsystems (e.g., "build a platform with chat, file storage, billing, and analytics"), flag this immediately. Don't spend questions refining details of a project that needs to be decomposed first.
 - If the project is too large for a single spec, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal design flow. Each sub-project gets its own spec → plan → implementation cycle.
-- For appropriately-scoped projects, ask questions one at a time to refine the idea
-- Prefer multiple choice questions when possible, but open-ended is fine too
-- Only one question per message - if a topic needs more exploration, break it into multiple questions
+- **Spike / Bounded only:** ask clarifying questions one at a time to refine the idea. Prefer multiple choice when possible; open-ended is fine. Only one question per message — if a topic needs more exploration, break it into multiple questions.
+- **Architectural:** do **not** apply one-question-at-a-time. Use Checklist Step 3 frontier rounds with the decision-support format (Options / Trade-offs / Recommendation / Reason / What would change this recommendation).
 - Focus on understanding: purpose, constraints, success criteria
 
 **Exploring approaches:**
