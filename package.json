@@ -1,7 +1,7 @@
 {
   "name": "@firefly0621/dsh-superpowers",
   "description": "obra/superpowers skills provider plus system-prompt bootstrap for DeepSeek Harness",
-  "version": "0.1.0-rc.21",
+  "version": "0.1.0-rc.22",
   "publishConfig": {
     "access": "public"
   },

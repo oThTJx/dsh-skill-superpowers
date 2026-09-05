@@ -4,7 +4,7 @@ English | [中文](README.zh.md)
 
 Installable DeepSeek Harness plugin bundle that brings [obra/superpowers](https://github.com/obra/superpowers) into product sessions: the full skill library, adapted to dsh tooling, plus a SessionStart-equivalent bootstrap.
 
-Publish name: `@firefly0621/dsh-superpowers` (version tracks the harness family, currently `0.1.0-rc.21`). Source of record for this fork package: [github.com/oThTJx/dsh-superpowers](https://github.com/oThTJx/dsh-superpowers). This package is opt-in and is not part of the official main `dsh-base` composition.
+Publish name: `@firefly0621/dsh-superpowers` (version tracks the harness family, currently `0.1.0-rc.22`). Source of record for this fork package: [github.com/oThTJx/dsh-superpowers](https://github.com/oThTJx/dsh-superpowers). This package is opt-in and is not part of the official main `dsh-base` composition.
 
 ## What it restores
 
@@ -57,7 +57,7 @@ Then boot `dsh --profile web` (or `pnpm dsh web`). If this fork's `dsh-base` alr
 ```sh
 pnpm run build:lib:host
 pnpm --filter @firefly0621/dsh-superpowers pack
-pnpm dsh plugin --profile superpowers-demo add ./firefly0621-dsh-superpowers-0.1.0-rc.21.tgz
+pnpm dsh plugin --profile superpowers-demo add ./firefly0621-dsh-superpowers-0.1.0-rc.22.tgz
 ```
 
 (`pnpm pack` writes the tarball to the repository root by default. There is no per-package `build` script; host lib build produces `lib/`.)

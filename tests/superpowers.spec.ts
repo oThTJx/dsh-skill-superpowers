@@ -4,8 +4,8 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { afterEach, describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import { CallId, createUserMessage, type GenerateOptions } from '@deepseek-ai/dsh-llm'
-import { Session, SessionId, type SessionEvent } from '@deepseek-ai/dsh-session'
+import { ToolCallId, createUserMessage, type GenerateOptions } from '@deepseek-ai/dsh-llm'
+import { SESSION_FORMAT_VERSION, Session, SessionId, type SessionEvent } from '@deepseek-ai/dsh-session'
 import { Inbox, agentEvents, type Agent } from '@deepseek-ai/dsh-agent'
 import AgentLoop from '@deepseek-ai/dsh-agent-loop'
 import { mountAgentLoopTestDependencies } from '@deepseek-ai/dsh-agent-loop-testkit'
@@ -91,7 +91,7 @@ function systemText(request: GenerateOptions): string {
 
 /** Durable user-message text; the bootstrap must not become conversation history. */
 function userMessageTexts(agent: Agent): string[] {
-  return [...agent.session.events]
+  return [...agent.session.snapshotEvents()]
     .filter((e): e is SessionEvent<'user/message'> => e.type === 'user/message')
     .map(e => e.data.content.map(block => block.type === 'text' ? block.text : '').join(''))
 }
@@ -407,7 +407,7 @@ describe('invocation and tier frontmatter', () => {
 describe('model catalog with Superpowers invocation policy', () => {
   function agentForCatalog(): Agent {
     const id = SessionId('sp-catalog')
-    const session = Session.create(id, [], { version: 0, id, createdAt: 0, cwd: '/workspace' })
+    const session = Session.create(id, [], { version: SESSION_FORMAT_VERSION, id, createdAt: 0, cwd: '/workspace', isSeeded: false })
     return {
       ctx: new Context(),
       id,
@@ -462,7 +462,7 @@ describe('model catalog with Superpowers invocation policy', () => {
 
     const refused = await ctx.tools.execute({
       signal: new AbortController().signal,
-      callId: CallId('sp-handoff'),
+      callId: ToolCallId('sp-handoff'),
       name: 'skill',
       arguments: { name: 'handoff' },
     })
@@ -494,7 +494,7 @@ describe('model catalog with Superpowers invocation policy', () => {
       expect(catalog).not.toContain(name)
       const refused = await ctx.tools.execute({
         signal: new AbortController().signal,
-        callId: CallId(`sp-${name}`),
+        callId: ToolCallId(`sp-${name}`),
         name: 'skill',
         arguments: { name },
       })
@@ -885,7 +885,7 @@ describe('package composition contracts', () => {
       dsh: { bundle: { patch: string } }
     }
     // Pin the published package version so README "currently …" and npm publish stay in lockstep.
-    expect(pkg.version).toBe('0.1.0-rc.21')
+    expect(pkg.version).toBe('0.1.0-rc.22')
     expect(pkg.dsh.bundle.patch).toBe('./cordis.patch.yml')
     expect(pkg.files).toEqual([
       'lib/index.js',
@@ -989,7 +989,7 @@ describe('dsh-superpowers plugin', () => {
     ctx.llm.registerAdapter(['mock'], adapter)
 
     await fiber.dispose()
-    const agent = ctx.agentLoop.create(SessionId('sp-dispose'), { provider: 'mock', model: 'mock' })
+    const agent = await ctx.agentLoop.create(SessionId('sp-dispose'), { provider: 'mock', model: 'mock' })
     agent.followup(createUserMessage({ content: [{ type: 'text', text: 'hi' }], source: { kind: 'user' } }))
     await waitForIdle(ctx, agent)
     expect(systemText(adapter.requests[0]!)).not.toContain('You have superpowers.')
@@ -1005,7 +1005,7 @@ describe('dsh-superpowers plugin', () => {
     const adapter = new MockAdapter([textResponse('ok')])
     ctx.llm.registerAdapter(['mock'], adapter)
 
-    const agent = ctx.agentLoop.create(SessionId('sp-boot'), { provider: 'mock', model: 'mock' })
+    const agent = await ctx.agentLoop.create(SessionId('sp-boot'), { provider: 'mock', model: 'mock' })
     agent.followup(createUserMessage({ content: [{ type: 'text', text: 'hi' }], source: { kind: 'user' } }))
     await waitForIdle(ctx, agent)
 
@@ -1028,7 +1028,7 @@ describe('dsh-superpowers plugin', () => {
     const adapter = new MockAdapter([textResponse('ok')])
     ctx.llm.registerAdapter(['mock'], adapter)
 
-    const agent = ctx.agentLoop.create(SessionId('sp-off'), { provider: 'mock', model: 'mock' })
+    const agent = await ctx.agentLoop.create(SessionId('sp-off'), { provider: 'mock', model: 'mock' })
     agent.followup(createUserMessage({ content: [{ type: 'text', text: 'hi' }], source: { kind: 'user' } }))
     await waitForIdle(ctx, agent)
 
@@ -1065,7 +1065,7 @@ describe('dsh-superpowers plugin', () => {
     const adapter = new MockAdapter([textResponse('one'), textResponse('two')])
     ctx.llm.registerAdapter(['mock'], adapter)
 
-    const agent = ctx.agentLoop.create(SessionId('sp-every-step'), { provider: 'mock', model: 'mock' })
+    const agent = await ctx.agentLoop.create(SessionId('sp-every-step'), { provider: 'mock', model: 'mock' })
     agent.followup(createUserMessage({ content: [{ type: 'text', text: 'first' }], source: { kind: 'user' } }))
     await waitForIdle(ctx, agent)
     agent.followup(createUserMessage({ content: [{ type: 'text', text: 'second' }], source: { kind: 'user' } }))
